@@ -82,6 +82,18 @@ def compute_weigths():
     return pesos
 
 
+def compute_G():
+    for k in range(0, K):
+        for j in range(0, p):
+            dist_vector = np.zeros(n, dtype=float)
+            for h in range(0, n):
+                soma = 0
+                for i in range(0, n):
+                    soma += np.power(U[i][k], m) * dis_matrix[j][i][h]
+                dist_vector[h] = soma
+            G[k][j] = np.argmin(dist_vector)
+    return G
+
 print('Começou:', datetime.now())
 
 # importing datasets
@@ -112,26 +124,30 @@ pesos = np.ones((K, p), dtype=float)
 U = np.zeros((n, K), dtype=float)
 G = np.random.choice(n, size=(K, p), replace=False)
 
-print('Start loop: ', datetime.now())
+print('-------------------Start loop: ', datetime.now(), '-------------------')
 for i in range(0, n):
     for k in range(0, K):
         U[i][k] = compute_u(i, k)
 J = objective_function()
 print('Inicial J = ', J)
+print('Inicial Prototipos ', G)
 last_J = J + 10
 
 t = 0
 while (abs(J - last_J) >= e) and (t < T):
     last_J = J
     """Step 1"""
-    G = np.random.choice(n, size=(K, p), replace=False)
+    G = compute_G()
+    print('Prototipos ', G)
     """Step 2"""
     pesos = compute_weigths()
+    print('Pesos ', pesos)
     """Step 3"""
     for i in range(0, n):
         for k in range(0, K):
             U[i][k] = compute_u(i, k)
     J = objective_function()
+    print("U : ", U)
     t += 1
-    print('Iteração: ', t, 'Valor função objetivo: ', J)
+    print('------------------- Iteração: ', t, 'Valor função objetivo: ', J, '-------------------')
 print('Finalizou: ', datetime.now())
