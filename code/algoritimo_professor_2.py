@@ -7,16 +7,16 @@ Original file is located at
     https://colab.research.google.com/drive/1KIWksJfX23uneVeRbAWEgVa1biZRXHvP
 """
 
-from time import time
 from datetime import datetime
 
 import numpy as np
 import pandas as pd
+from sklearn.metrics import adjusted_rand_score
 
 # algorithm parameters
 K = 10  # number of partitions
 m = 1.6  # fuzzification parameter
-T = 10
+T = 150
 e = 10e-10
 p = 3  # number of views
 n = 2000
@@ -65,6 +65,13 @@ def compute_u(i, k):
     return membership
 
 
+def crisp_partition():
+    y = np.zeros(n, dtype=int)
+    for i in range(0, n):
+        y[i] = np.argmax(U[i])
+    return y
+
+
 def compute_weigths():
     for j in range(0, p):
         for k in range(0, K):
@@ -95,7 +102,6 @@ def compute_G():
     return G
 
 print('Começou:', datetime.now())
-
 # importing datasets
 fac_dataset = pd.read_csv('../data_bases/mfeat_fac.csv', header=None)
 fou_dataset = pd.read_csv('../data_bases/mfeat_fou.csv', header=None)
@@ -110,7 +116,7 @@ kar_view = kar_dataset.iloc[:, :].values
 fac_norm = normalize_matrix(fac_view)
 fou_norm = normalize_matrix(fou_view)
 kar_norm = normalize_matrix(kar_view)
-print('Normalize')
+print('Normalizou as matrizes')
 # compute dissimilarity matrixes
 fac_dis = dissimilarity_matrix(matrix=fac_norm, size=n)
 print('Computou fac_dis')
@@ -123,6 +129,18 @@ dis_matrix = [fac_dis, fou_dis, kar_dis]
 pesos = np.ones((K, p), dtype=float)
 U = np.zeros((n, K), dtype=float)
 G = np.random.choice(n, size=(K, p), replace=False)
+# Partição à priori em 10 classes
+y_priori = np.zeros(n, dtype=int)
+y_priori[200:400] = 1
+y_priori[400:600] = 2
+y_priori[600:800] = 3
+y_priori[800:1000] = 4
+y_priori[1000:1200] = 5
+y_priori[1200:1400] = 6
+y_priori[1400:1600] = 7
+y_priori[1600:1800] = 8
+y_priori[1800:2000] = 9
+
 
 print('-------------------Start loop: ', datetime.now(), '-------------------')
 for i in range(0, n):
@@ -150,4 +168,10 @@ while (abs(J - last_J) >= e) and (t < T):
     print("U : ", U)
     t += 1
     print('------------------- Iteração: ', t, 'Valor função objetivo: ', J, '-------------------')
+
+# Partição crisp considerando o U
+y = crisp_partition()
+print("Partição CRISP: ", y)
+rand_score = adjusted_rand_score(y_priori, y)
+print("Indice de Rand> ", rand_score)
 print('Finalizou: ', datetime.now())
