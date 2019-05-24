@@ -8,6 +8,7 @@ Original file is located at
 """
 
 from datetime import datetime
+import threading
 
 import numpy as np
 import pandas as pd
@@ -41,38 +42,41 @@ def dissimilarity_matrix(matrix, size):
     return dis_matrix
 
 
-def dist_object(i, k):
+def dist_object(i, k, pesos, dis_matrix, G):
     acc = 0
     for j in range(0, p):
         acc += pesos[k][j] * dis_matrix[j][i][G[k][j]]
     return acc
 
 
-def objective_function():
+def objective_function(U, pesos, G, dis_matrix):
     objective = 0
     for k in range(0, K):
         for i in range(0, n):
-            objective += np.power(U[i][k], m) * dist_object(i, k)
+            objective += np.power(U[i][k], m) * dist_object(i, k, pesos, dis_matrix, G)
     return objective
 
 
-def compute_u(i, k):
-    membership = 0
-    numerador = dist_object(i, k)
-    for h in range(0, K):
-        membership += np.power(numerador / dist_object(i, h), (1 / (m - 1)))
-    membership = np.power(membership, -1)
-    return membership
+def compute_u(U, pesos, G, dis_matrix):
+    for i in range(0, n):
+        for k in range(0, K):
+            membership = 0
+            numerador = dist_object(i, k, pesos, dis_matrix, G)
+            for h in range(0, K):
+                membership += np.power(numerador / dist_object(i, h, pesos, dis_matrix, G), (1 / (m - 1)))
+            membership = np.power(membership, -1)
+            U[i][k] = membership
+    return U
 
 
-def crisp_partition():
+def crisp_partition(U):
     y = np.zeros(n, dtype=int)
     for i in range(0, n):
         y[i] = np.argmax(U[i])
     return y
 
 
-def compute_weigths():
+def compute_weigths(U, pesos, G, dis_matrix):
     for j in range(0, p):
         for k in range(0, K):
             numerador = 1
@@ -89,7 +93,7 @@ def compute_weigths():
     return pesos
 
 
-def compute_G():
+def compute_G(G, U, dis_matrix):
     for k in range(0, K):
         for j in range(0, p):
             dist_vector = np.zeros(n, dtype=float)
@@ -101,77 +105,92 @@ def compute_G():
             G[k][j] = np.argmin(dist_vector)
     return G
 
-print('Começou:', datetime.now())
-# importing datasets
-fac_dataset = pd.read_csv('../data_bases/mfeat_fac.csv', header=None)
-fou_dataset = pd.read_csv('../data_bases/mfeat_fou.csv', header=None)
-kar_dataset = pd.read_csv('../data_bases/mfeat_kar.csv', header=None)
-print('Carregou os arquivos')
-# convert data frames to array
-fac_view = fac_dataset.iloc[:, :].values
-fou_view = fou_dataset.iloc[:, :].values
-kar_view = kar_dataset.iloc[:, :].values
 
-# Normalize matrixes (feature scaling)
-fac_norm = normalize_matrix(fac_view)
-fou_norm = normalize_matrix(fou_view)
-kar_norm = normalize_matrix(kar_view)
-print('Normalizou as matrizes')
-# compute dissimilarity matrixes
-fac_dis = dissimilarity_matrix(matrix=fac_norm, size=n)
-print('Computou fac_dis')
-fou_dis = dissimilarity_matrix(matrix=fou_norm, size=n)
-print('Computou fou_dis')
-kar_dis = dissimilarity_matrix(matrix=kar_norm, size=n)
-print('Computou kar_dis')
+class MyThread(threading.Thread):
 
-dis_matrix = [fac_dis, fou_dis, kar_dis]
-pesos = np.ones((K, p), dtype=float)
-U = np.zeros((n, K), dtype=float)
-G = np.random.choice(n, size=(K, p), replace=False)
-# Partição à priori em 10 classes
-y_priori = np.zeros(n, dtype=int)
-y_priori[200:400] = 1
-y_priori[400:600] = 2
-y_priori[600:800] = 3
-y_priori[800:1000] = 4
-y_priori[1000:1200] = 5
-y_priori[1200:1400] = 6
-y_priori[1400:1600] = 7
-y_priori[1600:1800] = 8
-y_priori[1800:2000] = 9
+    def run(self):
+        print('Começou {} tempo: {}'.format(self.getName(), datetime.now()))
+        # importing datasets
+        fac_dataset = pd.read_csv('../data_bases/mfeat_fac.csv', header=None)
+        fou_dataset = pd.read_csv('../data_bases/mfeat_fou.csv', header=None)
+        kar_dataset = pd.read_csv('../data_bases/mfeat_kar.csv', header=None)
+
+        # convert data frames to array
+        fac_view = fac_dataset.iloc[:, :].values
+        fou_view = fou_dataset.iloc[:, :].values
+        kar_view = kar_dataset.iloc[:, :].values
+
+        # Normalize matrixes (feature scaling)
+        fac_norm = normalize_matrix(fac_view)
+        fou_norm = normalize_matrix(fou_view)
+        kar_norm = normalize_matrix(kar_view)
+
+        # compute dissimilarity matrixes
+        fac_dis = dissimilarity_matrix(matrix=fac_norm, size=n)
+        fou_dis = dissimilarity_matrix(matrix=fou_norm, size=n)
+        kar_dis = dissimilarity_matrix(matrix=kar_norm, size=n)
+        dis_matrix = [fac_dis, fou_dis, kar_dis]
+
+        # Partição à priori em 10 classes
+        y_priori = np.zeros(n, dtype=int)
+        y_priori[200:400] = 1
+        y_priori[400:600] = 2
+        y_priori[600:800] = 3
+        y_priori[800:1000] = 4
+        y_priori[1000:1200] = 5
+        y_priori[1200:1400] = 6
+        y_priori[1400:1600] = 7
+        y_priori[1600:1800] = 8
+        y_priori[1800:2000] = 9
+
+        # Inicialização dos vetores
+        pesos = np.ones((K, p), dtype=float)
+        U = np.zeros((n, K), dtype=float)
+        G = np.random.choice(n, size=(K, p), replace=False)
+        U = compute_u(U, pesos, G, dis_matrix)
+        J = objective_function(U, pesos, G, dis_matrix)
+        last_J = J + 100  # somado 100 apenas para entrar a primeira vez no laço.
+
+        t = 0
+        while (abs(J - last_J) >= e) and (t < T):
+            last_J = J
+            """Step 1"""
+            G = compute_G(G, U, dis_matrix)
+            """Step 2"""
+            pesos = compute_weigths(U, pesos, G, dis_matrix)
+            """Step 3"""
+            U = compute_u(U, pesos, G, dis_matrix)
+            J = objective_function(U, pesos, G, dis_matrix)
+            t += 1
+
+        # Partição crisp considerando o ultimo vetor U
+        y = crisp_partition(U)
+        rand_score = adjusted_rand_score(y_priori, y)
+
+        with open('{}-output.txt'.format(self.getName()), 'w') as f:
+            f.write('J = {}\n'.format(J))
+            f.write('Rand = {}\n\n'.format(rand_score))
+
+            f.write('Protoripos\n')
+            for line in G:
+                f.write(np.array_str(line) + "\n")
+            f.write('\n')
+
+            f.write('Pesos\n')
+            for line in pesos:
+                f.write(np.array_str(line) + "\n")
+            f.write('\n')
+
+        np.savetxt(fname='{}-crisp-partition.txt'.format(self.getName()), X=y, fmt='%d', delimiter=',',
+                   header='Para carregar em um array, usar numpy.loadtxt()', comments='#')
+        print('Finalizou {} tempo: {}'.format(self.getName(), datetime.now()))
 
 
-print('-------------------Start loop: ', datetime.now(), '-------------------')
-for i in range(0, n):
-    for k in range(0, K):
-        U[i][k] = compute_u(i, k)
-J = objective_function()
-print('Inicial J = ', J)
-print('Inicial Prototipos ', G)
-last_J = J + 10
+def main():
+    for x in range(4):
+        mythread = MyThread(name="Execução-{}".format(x + 1))
+        mythread.start()
 
-t = 0
-while (abs(J - last_J) >= e) and (t < T):
-    last_J = J
-    """Step 1"""
-    G = compute_G()
-    print('Prototipos ', G)
-    """Step 2"""
-    pesos = compute_weigths()
-    print('Pesos ', pesos)
-    """Step 3"""
-    for i in range(0, n):
-        for k in range(0, K):
-            U[i][k] = compute_u(i, k)
-    J = objective_function()
-    print("U : ", U)
-    t += 1
-    print('------------------- Iteração: ', t, 'Valor função objetivo: ', J, '-------------------')
 
-# Partição crisp considerando o U
-y = crisp_partition()
-print("Partição CRISP: ", y)
-rand_score = adjusted_rand_score(y_priori, y)
-print("Indice de Rand> ", rand_score)
-print('Finalizou: ', datetime.now())
+if __name__ == '__main__':
+    main()
