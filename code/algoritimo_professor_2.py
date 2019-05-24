@@ -165,6 +165,8 @@ class MyThread(threading.Thread):
 
         # Partição crisp considerando o ultimo vetor U
         y = crisp_partition(U)
+        # TODO: Imprimir os elementos da partição crisp (y) por grupo (classe), assim como a quantidade de elementos
+        # exemplo: Grupo 1 -> elementos: 1,2,3,4,10,20 -> quantidade: 6
         rand_score = adjusted_rand_score(y_priori, y)
 
         with open('{}-output.txt'.format(self.getName()), 'w') as f:
