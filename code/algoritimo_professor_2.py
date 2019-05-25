@@ -167,7 +167,7 @@ class MyThread(threading.Thread):
             f.write('J = {}\n'.format(J))
             f.write('Rand = {}\n\n'.format(rand_score))
 
-            f.write('Protoripos\n')
+            f.write('Prototipos\n')
             for line in G:
                 f.write(np.array_str(line) + "\n")
             f.write('\n')
@@ -183,7 +183,7 @@ class MyThread(threading.Thread):
 
 
 def main():
-    for x in range(100):
+    for x in range(2):
         mythread = MyThread(name="Execução-{}".format(x + 1))
         mythread.start()
 
