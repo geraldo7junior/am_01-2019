@@ -1,13 +1,11 @@
 from BayesianKneighborClassifier import BayesianKneighborClassifier
-import numpy as np
 
 
 def main():
     bkc = BayesianKneighborClassifier('../data_bases/daniel/crisp-partition.txt')
-
-
-    #rain, test = bkc.split_test_and_train_data(normalized_l2)
-    #bkc.run_knn_pipeline(train, test)
+    for data in bkc.data:
+            probability = bkc.check_probability(data, bkc.mfeat_fac_classifier.n_neighbors, i, bkc.mfeat_fac_classifier)
+            print (probability)
 
 
 if __name__ == '__main__':

@@ -13,7 +13,9 @@ class BayesianKneighborClassifier:
     def __init__(self, classification_path):
         self.data = []
         self.class_data = np.loadtxt(classification_path, dtype=int)
-        self.classifiers = self.build_classifiers()
+        self.mfeat_fac_classifier = self.build_classifier(15, 0)
+        self.mfeat_fou_classifier = self.build_classifier(13, 1)
+        self.mfeat_kar_classifier = self.build_classifier(13, 2)
 
     views = ['mfeat_fac', 'mfeat_fou', 'mfeat_kar']
     best_neighbours = [15, 13, 13]
@@ -65,6 +67,15 @@ class BayesianKneighborClassifier:
             classifiers.append(knn)
         return classifiers
 
+    def build_classifier(self, n_neighbours, data_index):
+        """Builds 3 Knn classifiers, one for each view with fixed number of K based on previous experiments"""
+        knn = KNeighborsClassifier(n_neighbors=n_neighbours)
+        BayesianKneighborClassifier.update_current_data(self, data_index)
+        X_train, X_test, y_train, y_test = BayesianKneighborClassifier.split_test_and_train_data\
+            (self, test_size=0.3)
+        knn.fit(X_train, y_train)
+        return knn
+
     def check_knn_accuracy(self, neighbors=5, view_index=0):
         """Calculates the accuracy for the classifiers, in order to find the best values of K"""
         BayesianKneighborClassifier.update_current_data(self, view_index)
@@ -77,6 +88,27 @@ class BayesianKneighborClassifier:
             metrics.accuracy_score(y_application, y_pred), neighbors,
             BayesianKneighborClassifier.views[view_index]))
         return metrics.accuracy_score(y_application, y_pred)
+
+    def check_probability(self, x, k_neighbours, expected_class, classifier):
+        """Calculates the probability of an example to belong to an expected class, it will use the
+        k-nearest neighbours to get the closest items from it and check if they belong to the class expected
+        the final output will be a probability of the number of neighbours in the class expected divided by
+        the number of neighbours checked"""
+        match_number = 0
+        distances, indexes = classifier.kneighbors(x.reshape(1, -1), k_neighbours)
+        for idx in indexes:
+            for element in idx:
+                predict = self.mfeat_classifier.predict(self.data[element].reshape(1, -1))
+                if predict[0] and predict[0] == expected_class:
+                    match_number += 1
+        return float(match_number)/k_neighbours
+
+
+
+
+
+
+
 
 
 
