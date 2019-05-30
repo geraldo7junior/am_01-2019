@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import threading
+import time
 from datetime import datetime
 
 import numpy as np
@@ -183,9 +184,15 @@ class MyThread(threading.Thread):
 
 
 def main():
-    for x in range(1):
-        mythread = MyThread(name="Execução-{}".format(x + 1))
-        mythread.start()
+    threads = []
+    for x in range(60, 100):
+        t = MyThread(name="Execução-{}".format(x + 1))
+        threads.append(t)
+        t.start()
+        time.sleep(2)
+    for x in threads:
+        x.join()
+    print("Acabou")
 
 
 if __name__ == '__main__':
