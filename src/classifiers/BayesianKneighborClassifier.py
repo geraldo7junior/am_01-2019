@@ -11,6 +11,9 @@ class BayesianKneighborClassifier:
     """Combined classifier based on the combination of Bayesian theorem and k-neighbours algorithm"""
 
     def __init__(self, classification_path):
+        # TODO: Rodar novamente o KNN com a particao crisp 'otima' para reavaliar os valores de K
+        """"The values used on the build classifier were defined after some experiments with the data and the KNN classifier
+        which ended up with these values as the best"""
         self.data = list()
         self.class_data = np.loadtxt(classification_path, dtype=int)
         self.mfeat_fac_classifier = self.build_classifier(15, 0)
