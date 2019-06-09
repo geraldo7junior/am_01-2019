@@ -7,7 +7,6 @@ import numpy as np
 class GaussianBayesClassifier:
 
     def __init__(self, classification_path):
-        # X = np.array([[-1, -1], [-2, -1], [-3, -2], [1, 1], [2, 1], [3, 2], [10, 10]])
         self.data_mfeat_fac = self.normalize_data(pd.read_csv('../data_bases/mfeat_fac.csv', header=None))
         self.data_mfeat_fou = self.normalize_data(pd.read_csv('../data_bases/mfeat_fou.csv', header=None))
         self.data_mfeat_kar = self.normalize_data(pd.read_csv('../data_bases/mfeat_kar.csv', header=None))
