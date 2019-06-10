@@ -23,15 +23,15 @@ class GaussianBayesClassifier:
         gbc.fit(data_in, data_class)
         return gbc
 
-    def check_overall_probability(self, x1, x2, x3, expected_class):
+    def check_overall_probability(self, x1, x2, x3, expected_class, expected_class_index):
         """Calculates the probability of an example to belong to an expected class for all the views
          available on the classifier"""
         class_probability = self.frequency_dict.get(expected_class, 0)/len(self.y)
 
         # view_probability[numero do exemplo][numero da classe]
-        view1_probability = self.mfeat_fac_classifier.predict_proba([x1])[0][expected_class]
-        view2_probability = self.mfeat_fou_classifier.predict_proba([x2])[0][expected_class]
-        view3_probability = self.mfeat_kar_classifier.predict_proba([x3])[0][expected_class]
+        view1_probability = self.mfeat_fac_classifier.predict_proba([x1])[0][expected_class_index]
+        view2_probability = self.mfeat_fou_classifier.predict_proba([x2])[0][expected_class_index]
+        view3_probability = self.mfeat_kar_classifier.predict_proba([x3])[0][expected_class_index]
 
         return ((1 - 3) * class_probability) + view1_probability + view2_probability + view3_probability
 
@@ -42,7 +42,7 @@ class GaussianBayesClassifier:
         classes = list(set(self.y))
         classes.sort()
         for r in range(len(classes)):
-            probabilities[classes[r]] = self.check_overall_probability(x1, x2, x3, r)
+            probabilities[classes[r]] = self.check_overall_probability(x1, x2, x3, classes[r], r)
         return max(probabilities, key=probabilities.get)
 
     def predict(self, X1, X2, X3):

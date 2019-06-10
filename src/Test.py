@@ -27,10 +27,10 @@ def main():
     data_mfeat_kar = normalize_data(pd.read_csv('../data_bases/mfeat_kar.csv', header=None))
     data_class = np.loadtxt('../data_bases/daniel/crisp-partition.txt', dtype=int)
 
-    kf = KFold(n_splits=10)
+    kf = KFold(n_splits=10, shuffle=True)
     medias_bkc = []
     medias_gbc = []
-    for x in range(5):
+    for x in range(30):
         acc_bkc = []
         acc_gbc = []
         for train_index, test_index in kf.split(data_mfeat_fac):

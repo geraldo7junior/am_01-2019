@@ -64,7 +64,7 @@ class BayesianKNNClassifier:
                     match_number += 1
         return float(match_number)/len(indexes)
 
-    def check_overall_probability(self, x1, x2, x3, expected_class):
+    def check_overall_probability(self, x1, x2, x3, expected_class, expected_class_index):
         """Calculates the probability of an example to belong to an expected class for all the views"""
         class_probability = self.frequency_dict.get(expected_class, 0)/len(self.y)
 
@@ -81,7 +81,7 @@ class BayesianKNNClassifier:
         classes = list(set(self.y))
         classes.sort()
         for r in range(len(classes)):
-            probabilities[classes[r]] = self.check_overall_probability(x1, x2, x3, r)
+            probabilities[classes[r]] = self.check_overall_probability(x1, x2, x3, classes[r], r)
         return max(probabilities, key=probabilities.get)
 
     def predict(self, X1, X2, X3):
