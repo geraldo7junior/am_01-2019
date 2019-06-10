@@ -7,20 +7,6 @@ import numpy as np
 from sklearn import metrics
 
 
-def normalize_data(data, norm='l2'):
-    """ normalizes input data
-    https://scikit-learn.org/stable/modules/preprocessing.html#normalization"""
-    normalized_data = preprocessing.normalize(data, norm)
-    return normalized_data
-
-
-def train_test_validation_split(X, Y, test_size=0.2, validation_size=0.25):
-    """Separate the data into train, test and application according to the proportions"""
-    X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=test_size)
-    X_train, X_val, y_train, y_val = train_test_split(X_test, y_test, test_size=validation_size)
-    return X_train, X_test, X_val, y_train, y_test, y_val
-
-
 def find_best_k(data_in, data_class):
     """Calculates the accuracy for the classifiers, to find the best value of K"""
     X_train, X_val, y_train, y_val = train_test_split(data_in, data_class, test_size=0.2)
