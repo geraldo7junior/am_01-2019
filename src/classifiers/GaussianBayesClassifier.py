@@ -45,7 +45,7 @@ class GaussianBayesClassifier:
             probabilities[classes[r]] = self.check_overall_probability(x1, x2, x3, r)
         return max(probabilities, key=probabilities.get)
 
-    def predict_class(self, X1, X2, X3):
+    def predict(self, X1, X2, X3):
         predict_y = []
         for i in range(len(X1)):
             predict_y.append(self.check_max_probability(X1[i], X2[i], X3[i]))

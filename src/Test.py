@@ -1,5 +1,3 @@
-from random import randint
-
 import numpy as np
 import pandas as pd
 from classifiers.BayesianKNNClassifier import BayesianKNNClassifier
@@ -46,8 +44,8 @@ def main():
             gbc = GaussianBayesClassifier(X1_train, X2_train, X3_train, y_train)
 
             # Accuracy
-            bkc_predict_y = bkc.predict_class(X1_test, X2_test, X3_test)
-            gbc_predict_y = gbc.predict_class(X1_test, X2_test, X3_test)
+            bkc_predict_y = bkc.predict(X1_test, X2_test, X3_test)
+            gbc_predict_y = gbc.predict(X1_test, X2_test, X3_test)
 
             m1 = metrics.accuracy_score(y_test, bkc_predict_y)
             m2 = metrics.accuracy_score(y_test, gbc_predict_y)
@@ -58,6 +56,9 @@ def main():
         medias_gbc.append(statistics.mean(acc_bkc))
     print(medias_bkc)
     print(medias_gbc)
+    # from sklearn.model_selection import cross_val_score
+    # resultado = cross_val_score(regression, X_test, y_test, cv=10)
+    # print(resultado.mean())
 
 
 if __name__ == '__main__':
