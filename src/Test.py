@@ -47,18 +47,12 @@ def main():
             bkc_predict_y = bkc.predict(X1_test, X2_test, X3_test)
             gbc_predict_y = gbc.predict(X1_test, X2_test, X3_test)
 
-            m1 = metrics.accuracy_score(y_test, bkc_predict_y)
-            m2 = metrics.accuracy_score(y_test, gbc_predict_y)
-
-            acc_bkc.append(m1)
-            acc_gbc.append(m2)
-        medias_bkc.append(statistics.mean(acc_gbc))
-        medias_gbc.append(statistics.mean(acc_bkc))
-    print(medias_bkc)
-    print(medias_gbc)
-    # from sklearn.model_selection import cross_val_score
-    # resultado = cross_val_score(regression, X_test, y_test, cv=10)
-    # print(resultado.mean())
+            acc_bkc.append(metrics.accuracy_score(y_test, bkc_predict_y))
+            acc_gbc.append(metrics.accuracy_score(y_test, gbc_predict_y))
+        medias_bkc.append(statistics.mean(acc_bkc))
+        medias_gbc.append(statistics.mean(acc_gbc))
+    print("BayesianKNNClassifier: ", medias_bkc)
+    print("GaussianBayesClassifier: ", medias_gbc)
 
 
 if __name__ == '__main__':
