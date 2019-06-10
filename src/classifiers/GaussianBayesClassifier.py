@@ -39,8 +39,10 @@ class GaussianBayesClassifier:
         """Calculates the probability for an example to belong to a class Wr (0-9), returning the class with the
         maximum probability value found"""
         probabilities = dict()
-        for r in range(0, 10):
-            probabilities[r] = self.check_overall_probability(x1, x2, x3, r)
+        classes = list(set(self.y))
+        classes.sort()
+        for r in range(len(classes)):
+            probabilities[classes[r]] = self.check_overall_probability(x1, x2, x3, r)
         return max(probabilities, key=probabilities.get)
 
     def predict_class(self, X1, X2, X3):

@@ -21,8 +21,8 @@ def find_best_k(data_in, data_class):
         if acc > best_acc:
             best_acc = acc
             k = neighbors
-        print("Accuracy: {} using K={} neighbours in view:".format(acc, neighbors))
-    print("Best accuracy: {}, best K: {}".format(best_acc, k))
+        # print("Accuracy: {} using K={} neighbours in view:".format(acc, neighbors))
+    # print("Best accuracy: {}, best K: {}".format(best_acc, k))
     return k
 
 
@@ -78,8 +78,10 @@ class BayesianKNNClassifier:
         """Calculates the probability for an example to belong to a class Wr (0-9), returning the class with the
         maximum probability value found"""
         probabilities = dict()
-        for r in range(0, 10):  # Calcular a probabilidade pra cada classe
-            probabilities[r] = self.check_overall_probability(x1, x2, x3, r)
+        classes = list(set(self.y))
+        classes.sort()
+        for r in range(len(classes)):
+            probabilities[classes[r]] = self.check_overall_probability(x1, x2, x3, r)
         return max(probabilities, key=probabilities.get)
 
     def predict_class(self, X1, X2, X3):
