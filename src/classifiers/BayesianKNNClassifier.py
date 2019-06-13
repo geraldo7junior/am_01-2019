@@ -10,7 +10,7 @@ from sklearn import metrics
 def find_best_k(data_in, data_class):
     """Calculates the accuracy for the classifiers, to find the best value of K"""
     X_train, X_val, y_train, y_val = train_test_split(data_in, data_class, test_size=0.2)
-    k_options = [x for x in range(50) if x % 2 != 0]
+    k_options = [x for x in range(int(math.sqrt(len(data_class)))) if x % 2 != 0]
     k = k_options[0]
     best_acc = 0
     for neighbors in k_options:
@@ -22,7 +22,7 @@ def find_best_k(data_in, data_class):
             best_acc = acc
             k = neighbors
         # print("Accuracy: {} using K={} neighbours in view:".format(acc, neighbors))
-    # print("Best accuracy: {}, best K: {}".format(best_acc, k))
+    print("best K: {}".format(k))
     return k
 
 
