@@ -17,6 +17,27 @@ def normalize_data(data, norm='l2'):
 
 
 def main():
+    print("Check BayesianKneighborClassifier")
+    bkc = BayesianKneighborClassifier('../data_bases/daniel/crisp-partition.txt')
+    random_data = list()
+    random_index = randint(0, 2000)
+    random_data.append(bkc.return_view_sample(0, random_index))
+    random_data.append(bkc.return_view_sample(1, random_index))
+    random_data.append(bkc.return_view_sample(2, random_index))
+    bkc.check_max_probability(random_data)
+
+
+    print("Check perform wilcoxon validation sample")
+    list_1 = [30, 19, 19, 23, 29, 178, 42 , 20, 12, 39, 14, 81, 17, 31, 52]
+    list_2 = [30, 6, 14, 8, 14, 52, 14, 22, 17, 8, 11, 30, 14, 17, 15]
+    ExperimentUtil.perform_wilcoxon_validation(list_1, list_2)
+    ExperimentUtil.calculate_error_margin(list(), 0.95)
+    
+
+    print("Check GaussianBayesClassifier")
+    gbc = GaussianBayesClassifier('../data_bases/daniel/crisp-partition.txt')
+    random_index = randint(0, 2000)
+    gbc.check_max_probability(random_index)
 
     gaussian_scores = [0.7145, 0.7015, 0.7025, 0.715, 0.716, 0.6985, 0.6915, 0.6955, 0.7035, 0.7095, 0.6955, 0.7225, 0.6985, 0.7015, 0.7085, 0.716, 0.7035, 0.708, 0.6975, 0.716, 0.709, 0.7005, 0.708, 0.699, 0.6930000000000001, 0.701, 0.7095, 0.704, 0.7245, 0.709]
     knn_scores = [0.786, 0.7775000000000001, 0.781, 0.7845, 0.7725, 0.772, 0.771, 0.77, 0.775, 0.763, 0.766, 0.792, 0.7735, 0.763, 0.77, 0.78, 0.768, 0.7655, 0.7735000000000001, 0.7705, 0.778, 0.776, 0.775, 0.756, 0.7785, 0.771, 0.7765, 0.7705, 0.781, 0.776]
@@ -78,6 +99,7 @@ def best_J():
         file.close()
     print(min(jotas))
     # best J = 1240.8175952498866
+
 
 
 if __name__ == '__main__':
