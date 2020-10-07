@@ -16,7 +16,6 @@ class ExperimentUtil:
         critical_value = st.norm.ppf(1 - (1 - confidence_coefficient) / 2)
         std_error = statistics.stdev(input_data) / math.sqrt(len(input_data))
         return critical_value * std_error
-        return error_margin
 
     @staticmethod
     def calculate_confidence_interval(input_data, confidence_coeficient=0.95):
@@ -64,6 +63,12 @@ class ExperimentUtil:
                 sum_positive += score
         return sum_positive, sum_negative
 
+
+    @staticmethod
+    def wilcoxon(series1, series2):
+        T, p_value = st.wilcoxon(series1, series2)
+        return T, p_value
+
     @staticmethod
     def perform_wilcoxon_validation(series1, series2):
         """This method performs Wilcoxon validation. The boolean output means that the null hypothesis
@@ -78,9 +83,9 @@ class ExperimentUtil:
 
         sum_positive, sum_negative = ExperimentUtil._calculate_positive_negative_sum(position_diffs)
         T = min(sum_positive, sum_negative)
-        # TODO: Se o tamanho de n for maior que 30, é preciso usar a tabela T-Student
+        # TODO: Se o tamanho de n for maior que 30, seria preciso usar a tabela T-Student
         if len(position_diffs) <= 30:
-            # TODO: Com o valor de T, precisamos ver qual o valor critico e elaborar melhor a resposta no relatório
+            # TODO: Com o valor de T, precisamos ver qual o valor critico e elaborar melhor a resposta no relatorio
             return T < ExperimentUtil.wilcox_table[len(position_diffs)]
 
 
